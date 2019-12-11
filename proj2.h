@@ -90,8 +90,9 @@ void parse_data() {
     //sort(data.begin(),data.end());
     cout << "This is data size: " << data[0].size() << endl;
     cout << "Data size: " << data.size() << endl;
-    cin >> value;
+    //cin >> value;
     double bestAccuracy = 0.0;
+    double accuracy = 0.0;
 
     // for(int i = 0; i < data.size(); i++) { // choose rows to initiate the rows
     //     for(int l = 1; l < data[i].size(); l++) { //add each feature to the comparison list
@@ -111,10 +112,39 @@ void parse_data() {
     //     }
     //     cout << endl;
     // }
-    vector<double> pureSet;
-    for(int i = 0; i < data.size(); i++) {
-        cout << "On the " << i << "th level of the search tree " << endl;
-        
+    vector<int> pureSet;
+    vector<int> testSet;
+    vector<int> testerSet;
+    int goodFeature = 0;
+    for(int i = 0; i < data[0].size(); i++) { // starting from 0, # of features is 0
+        pureSet.clear();
+        cout << "On the " << i + 1 << "th level of the search tree " << endl;
+        goodFeature = 0;
+        testSet.clear();
+        temp.clear();
+        testerSet.clear();
+        for(int j = 1; j < data[0].size(); j++) {
+            if(find(pureSet.begin(),pureSet.end(),j) == pureSet.end()) {
+                cout << "--Considering adding the " << j << " feature" << endl;
+                
+                testerSet.push_back(j);
+                testerSet.insert(testerSet.end(),testSet.begin(),testSet.end());
+                //testSet.push_back(j);
+                testerSet.insert(testerSet.end(),pureSet.begin(),pureSet.end());
+                for(int pog = 0; pog < testerSet.size(); pog++) {
+                    cout << "testerset: " << testerSet[pog] << endl;
+                }
+                
+                accuracy = leaveOneOut(data,testerSet);
+                if(bestAccuracy > accuracy) {
+                    bestAccuracy = accuracy;
+                    goodFeature = j;
+                }
+            }
+        }
+        pureSet.push_back(goodFeature);
+        cout << "On level " << i << " I added feature " << goodFeature << " to current set" << endl;
+        cout << "The best accuracy is: " << bestAccuracy << endl;
     }
 
     
