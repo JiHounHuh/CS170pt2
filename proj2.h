@@ -135,7 +135,9 @@ void forward_search(vector<vector<double>> data) {
 }
 
 double backward_search (vector<vector<double>> bork) {
-    
+    for(int i = bork[0].size(); i >= 0; i--){
+        
+    }
 }
 
 void parse_data() {
