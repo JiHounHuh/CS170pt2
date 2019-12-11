@@ -10,47 +10,137 @@
 
 using namespace std;
 
-class bigData {
-    public:
-        vector<vector<double>> data;
-        vector<double> compare;
-};
-
-// int normalizer(vector<vector<double>> test) {
-//     for(int i = 0; i < test.size(); i++) {
-//         for(int j = 1; j < test.size(); j++) {
-//             test[i][j] = ( 1 / (1 + exp(-test[i][j])));
-//         }
-//     }
-//     //return test;
-// }
-
 vector<double> trueSet;
 double bestDist = 0.0;
 double cDistance = 0.0;
 int bestLoc = 0;
+double total = 0.0;
+int counter = 0;
 
-double leaveOneOut(vector<vector<double>> test, vector<int>goodSet) {
-    int count = 0;
-    for(int i = 0; i < test.size(); i++) {
-        bestDist = 99999999.9999;
+double leaveOneOut(vector<vector<double>> test, vector<int>goodSet) 
+{
+    counter = 0;
+    total = 0.0;
+    cout << "Size of GoodSet= " << goodSet.size() << endl;
+    for(int i = 0; i < test.size(); i++) 
+    { // get row
+        bestDist = 99999.9999;
         bestLoc = -1;
-        for(int j = 0; j < test.size(); j++) {
-            cDistance = 0;
-            if(i != j) {
-                for(int k = 0; k < goodSet.size(); k++) {
-                    cDistance += pow((test[i][k] - test[j][k]),2);
+        for(int j = 0; j < test.size(); j++) 
+        { // get row 
+            cDistance = 0.0;
+            if(i != j) 
+            {
+                //cout << "Size of GoodSet  = " << goodSet.size() << endl;
+                for(int k = 0; k < goodSet.size()-1; k++) 
+                {
+                    cDistance += pow((test[i][goodSet[k]] - test[j][goodSet[k]]),2);
+                    //cDistance = cDistance + ((test[i][goodSet[k]] - test[j][goodSet[k]]) * (test[i][goodSet[k]] - test[j][goodSet[k]]));
                 }
-                if(cDistance < bestDist) {
+                cDistance = double(sqrt(cDistance));
+                if(cDistance < bestDist) 
+                {
                     bestDist = cDistance;
                     bestLoc = j;
                 }
             }
         }
-        if(test[i][0] == test[bestLoc][0]) count++;
-
+        if(test[i][0] == test[bestLoc][0]) {
+            counter++;
+            cout << "I got exemplar " << i + 1 << " correct" << endl;
+        }
     }
-    return (count / test.size());
+    //cout << "Test size is: " << test.size() << endl;
+    total = (double(counter) / double(test.size()));
+    cout << "total is: " << total << endl;
+    return total;
+}
+
+void forward_search(vector<vector<double>> data) {
+    cout << "This is feature size: " << data[0].size()-1 << endl;
+    cout << "Data size: " << data.size() << endl;
+    double bestAccuracy = 0.0;
+    double accuracy = 0.0;
+    double bestestAccuracy = 0.0;
+    vector<int> temp;
+    vector<int> current_set_of_features;
+    vector<int> testerSet;
+    vector<int> feature_to_add;
+    vector<int> master_list;
+    int goodFeature = 0;
+    master_list.clear();
+    for(int i = 1; i < data[0].size(); i++) 
+    { // starting from 1, # of features is 10
+        cout << "On the " << i  << "th level of the search tree " << endl;
+        feature_to_add.clear();
+        //current_set_of_features.clear();
+        temp.clear();
+        testerSet.clear();
+        bestAccuracy = 0.0;
+        for(int j = 1; j < data[0].size(); j++) 
+        {
+            if(!(find(current_set_of_features.begin(),current_set_of_features.end(),j) != current_set_of_features.end())) 
+            { // Consider if it does not exist
+                cout << "--Considering adding the " << j << " feature" << endl;
+                //testerSet.clear();
+                testerSet.push_back(j);
+                testerSet.insert(testerSet.end(),current_set_of_features.begin(),current_set_of_features.end());
+                testerSet.insert(testerSet.end(),feature_to_add.begin(),feature_to_add.end());
+                sort(testerSet.begin(),testerSet.end());
+                testerSet.erase(unique(testerSet.begin(),testerSet.end()),testerSet.end());
+                cout << "Tester Set: ";
+                for(int yelp = 0; yelp < testerSet.size();yelp++) {
+                    cout << testerSet[yelp] << " ";
+                }
+                cout << endl << "current set: ";
+
+                for (int kek = 0; kek < current_set_of_features.size();kek++)
+                {
+                    cout << current_set_of_features[kek] << " ";
+                }
+                cout << endl;
+                
+                accuracy = leaveOneOut(data,testerSet);
+                cout << "Accuracy: " << accuracy << endl;
+                if(accuracy > bestAccuracy) 
+                {
+                    cout << "time to update best: " << accuracy << endl;
+                    bestAccuracy = accuracy;
+                    goodFeature = j;
+                    if(bestAccuracy > bestestAccuracy) {
+                        master_list = current_set_of_features;
+                    }
+                }
+            }
+        }
+        current_set_of_features.push_back(goodFeature);
+        testerSet.clear();
+        if (bestestAccuracy < bestAccuracy) 
+        {
+            bestestAccuracy = bestAccuracy;
+            //master_list.clear();
+            master_list = current_set_of_features;
+        }
+        cout << "$##################################pushing goodFeature: " << goodFeature << endl;
+        
+        cout << "On level " << i+1 << " I added feature " << goodFeature << " to current set" << endl;
+        cout << "The best accuracy is: " << bestestAccuracy << endl;
+        cout << "Pure Set: ";
+        for(int pure = 0; pure < current_set_of_features.size();pure++) {
+            if (pure != current_set_of_features.size()-1) {
+                cout << current_set_of_features[pure] << " ";
+            }
+            else {
+                cout << current_set_of_features[pure] << endl;
+            }
+        }
+        cout << "Master List: " << endl;
+        for(int curr = 0; curr < master_list.size(); curr++) {
+            cout << master_list[curr] << " " << endl;
+        }
+    }
+    //cout << "Line count: " << count << endl;
+    return;
 }
 
 void parse_data() {
@@ -68,6 +158,7 @@ void parse_data() {
     string file;
     cout << "Input filename of data: "; // prompt for input of data
     cin >> file;
+    
     ifstream inFile;
     inFile.open(file);
     if (!inFile) { // ensure that file is valid
@@ -85,14 +176,10 @@ void parse_data() {
         count++;
     }
     inFile.close();
+    forward_search(data);
+}
 
-    
-    //sort(data.begin(),data.end());
-    cout << "This is data size: " << data[0].size() << endl;
-    cout << "Data size: " << data.size() << endl;
-    //cin >> value;
-    double bestAccuracy = 0.0;
-    double accuracy = 0.0;
+
 
     // for(int i = 0; i < data.size(); i++) { // choose rows to initiate the rows
     //     for(int l = 1; l < data[i].size(); l++) { //add each feature to the comparison list
@@ -112,59 +199,3 @@ void parse_data() {
     //     }
     //     cout << endl;
     // }
-    vector<int> pureSet;
-    vector<int> testSet;
-    vector<int> testerSet;
-    int goodFeature = 0;
-    for(int i = 0; i < data[0].size(); i++) { // starting from 0, # of features is 0
-        pureSet.clear();
-        cout << "On the " << i + 1 << "th level of the search tree " << endl;
-        goodFeature = 0;
-        testSet.clear();
-        temp.clear();
-        testerSet.clear();
-        for(int j = 1; j < data[0].size(); j++) {
-            if(find(pureSet.begin(),pureSet.end(),j) == pureSet.end()) {
-                cout << "--Considering adding the " << j << " feature" << endl;
-                
-                testerSet.push_back(j);
-                testerSet.insert(testerSet.end(),testSet.begin(),testSet.end());
-                //testSet.push_back(j);
-                testerSet.insert(testerSet.end(),pureSet.begin(),pureSet.end());
-                for(int pog = 0; pog < testerSet.size(); pog++) {
-                    cout << "testerset: " << testerSet[pog] << endl;
-                }
-                
-                accuracy = leaveOneOut(data,testerSet);
-                if(bestAccuracy > accuracy) {
-                    bestAccuracy = accuracy;
-                    goodFeature = j;
-                }
-            }
-        }
-        pureSet.push_back(goodFeature);
-        cout << "On level " << i << " I added feature " << goodFeature << " to current set" << endl;
-        cout << "The best accuracy is: " << bestAccuracy << endl;
-    }
-
-    
-    // for (int i = 0; i < data.size(); i++) {
-    //     cout << "On the " << i <<"th level of the search tree " << endl;
-    //     //lowestVal = data[i][1];
-    //     for(int j = 1; j < data[i].size(); j++) {
-    //         //cout << "--Considering adding the " << j << " feature" << endl;
-    //         // if(data[i][j] < 0) {
-    //         //    checkVal = abs(data[i][j] - lowestVal);
-    //         //   if (checkVal < lowestVal) {
-
-    //         //    }
-
-    //         // }
-    //        feature = rand() % 10;
-    //     }
-    //    cout << "On level " << i << " I added feature " << feature << " to current set" << endl;
-    // }
-    cout << "Line count: " << count << endl;
-}
-
-
