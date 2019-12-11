@@ -93,25 +93,28 @@ void parse_data() {
     cin >> value;
     double bestAccuracy = 0.0;
 
-    for(int i = 0; i < data.size(); i++) { // choose rows to initiate the rows
-        for(int l = 1; l < data[i].size(); l++) { //add each feature to the comparison list
-            checkup.push_back(data[i][l]);
-        }
-        for(int j = 0; j < data.size();j++) { // go through all the rows 
-            // for(int k = 0; k < data[j].size();k++) { // go through each feature of compared rows
+    // for(int i = 0; i < data.size(); i++) { // choose rows to initiate the rows
+    //     for(int l = 1; l < data[i].size(); l++) { //add each feature to the comparison list
+    //         checkup.push_back(data[i][l]);
+    //     }
+    //     for(int j = 0; j < data.size();j++) { // go through all the rows 
+    //         // for(int k = 0; k < data[j].size();k++) { // go through each feature of compared rows
 
-            // }
-            if (i != j) {
-                for(int m = 0; m < data[j].size(); m++) {
-                    cout << data[j][m] << ' ';
-                }
+    //         // }
+    //         if (i != j) {
+    //             for(int m = 0; m < data[j].size(); m++) {
+    //                 cout << data[j][m] << ' ';
+    //             }
                 
-            }
-            // else{
-            //     cout << data[i][j] << ' '; // print each line of the data vector
-            // }
-        }
-        cout << endl;
+    //         }
+
+    //     }
+    //     cout << endl;
+    // }
+    vector<double> pureSet;
+    for(int i = 0; i < data.size(); i++) {
+        cout << "On the " << i << "th level of the search tree " << endl;
+        
     }
 
     
@@ -134,10 +137,4 @@ void parse_data() {
     cout << "Line count: " << count << endl;
 }
 
-// leave_one_out_cross_validation(vector<vector<double>> crossData, vector<double>currentSet, double featureToAdd) {
-//     vector<double>trainSet;
-//     for(int i = 0; i < crossData.size(); i++) {
-        
-//     }
-// }
 
