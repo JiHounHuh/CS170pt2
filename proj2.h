@@ -46,9 +46,7 @@ double leaveOneOut(vector<vector<double>> test, vector<int>goodSet)
         }
         if(test[i][0] == test[bestLoc][0]) {
             counter = counter + 1;
-            //cout << "I got exemplar " << i + 1 << " correct" << endl;
         }
-        //else cout << "I got exemplar " << i + 1 << " incorrect" << endl;
     }
     //cout << "Test size is: " << test.size() << endl;
     cout << "Count is: " << counter << endl;
@@ -63,7 +61,6 @@ void forward_search(vector<vector<double>> data) {
     double bestAccuracy = 0.0;
     double accuracy = 0.0;
     double bestestAccuracy = 0.0;
-    //vector<int> temp;
     vector<int> current_set_of_features;
     vector<int> testerSet;
     vector<int> feature_to_add;
@@ -74,8 +71,6 @@ void forward_search(vector<vector<double>> data) {
     { // starting from 1, # of features is 10
         cout << "On the " << i  << "th level of the search tree " << endl;
         feature_to_add.clear();
-        //current_set_of_features.clear();
-        //temp.clear();
         testerSet.clear();
         bestAccuracy = 0.0;
         for(int j = 1; j < data[0].size(); j++) 
@@ -83,14 +78,8 @@ void forward_search(vector<vector<double>> data) {
             if(!(find(current_set_of_features.begin(),current_set_of_features.end(),j) != current_set_of_features.end())) 
             { // Consider if it does not exist
                 cout << "--Considering adding the " << j << " feature" << endl;
-                //testerSet.clear();
-                //testerSet.push_back(j);
                 testerSet = current_set_of_features;
                 testerSet.push_back(j);
-                //testerSet.insert(testerSet.end(),current_set_of_features.begin(),current_set_of_features.end());
-                //testerSet.insert(testerSet.end(),feature_to_add.begin(),feature_to_add.end());
-                //sort(testerSet.begin(),testerSet.end());
-                //testerSet.erase(unique(testerSet.begin(),testerSet.end()),testerSet.end());
                 cout << "Tester Set: ";
                 for(int yelp = 0; yelp < testerSet.size();yelp++) { // output tester set
                     cout << testerSet[yelp] << " ";
@@ -121,10 +110,9 @@ void forward_search(vector<vector<double>> data) {
         if (bestestAccuracy < bestAccuracy) 
         {
             bestestAccuracy = bestAccuracy;
-            //master_list.clear();
             master_list = current_set_of_features;
         }
-        cout << "$##################################pushing goodFeature: " << goodFeature << endl;
+        cout << "pushing goodFeature: " << goodFeature << endl;
         
         cout << "On level " << i << " I added feature " << goodFeature << " to current set" << endl;
         cout << "The best accuracy is: " << bestestAccuracy << endl;
@@ -144,6 +132,10 @@ void forward_search(vector<vector<double>> data) {
     }
     //cout << "Line count: " << count << endl;
     return;
+}
+
+double backward_search (vector<vector<double>> bork) {
+    
 }
 
 void parse_data() {
@@ -180,31 +172,5 @@ void parse_data() {
     }
     inFile.close();
     forward_search(data);
-    // for (int i = 0; i < data.size();i++){
-    //     for(int j = 0; j < data[i].size();j++){
-    //         cout << data[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
+
 }
-
-
-
-    // for(int i = 0; i < data.size(); i++) { // choose rows to initiate the rows
-    //     for(int l = 1; l < data[i].size(); l++) { //add each feature to the comparison list
-    //         checkup.push_back(data[i][l]);
-    //     }
-    //     for(int j = 0; j < data.size();j++) { // go through all the rows 
-    //         // for(int k = 0; k < data[j].size();k++) { // go through each feature of compared rows
-
-    //         // }
-    //         if (i != j) {
-    //             for(int m = 0; m < data[j].size(); m++) {
-    //                 cout << data[j][m] << ' ';
-    //             }
-                
-    //         }
-
-    //     }
-    //     cout << endl;
-    // }
