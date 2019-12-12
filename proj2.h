@@ -217,6 +217,7 @@ void backward_search (vector<vector<double>> bork)
 }
 
 void custom_search(vector<vector<double>> troop) {
+    for()
     return;
 }
 void parse_data() {
