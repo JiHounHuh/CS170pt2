@@ -16,9 +16,11 @@ double cDistance = 0.0;
 int bestLoc = 0;
 double total = 0.0;
 int counter = 0;
-
-double leaveOneOut(vector<vector<double>> test, vector<int>goodSet) 
+int bestCounter = 100;
+int errCounter = 0;
+double leaveOneOut(vector<vector<double>> test, vector<int>goodSet, bool customCheck) 
 {
+    errCounter = 0;
     counter = 0;
     total = 0.0;
     cout << "Size of GoodSet= " << goodSet.size() << endl;
@@ -47,11 +49,24 @@ double leaveOneOut(vector<vector<double>> test, vector<int>goodSet)
         if(test[i][0] == test[bestLoc][0]) {
             counter = counter + 1;
         }
+        else
+        {
+            errCounter = errCounter + 1;
+            if(customCheck)
+            {
+                if(bestCounter < errCounter)
+                {
+                    return 0.0;
+                }
+                
+            }
+        }
     }
     //cout << "Test size is: " << test.size() << endl;
     cout << "Count is: " << counter << endl;
     total = (double(counter) / double(test.size()));
     cout << "total is: " << total << endl;
+    bestCounter = test.size() - counter;
     return total;
 }
 vector<int> current_set_of_features;
@@ -91,7 +106,7 @@ void forward_search(vector<vector<double>> data) {
                 }
                 cout << endl;
                 
-                accuracy = leaveOneOut(data,testerSet);
+                accuracy = leaveOneOut(data,testerSet,false);
                 cout << "Accuracy: " << accuracy << endl; // output the leave one out accuracy 
                 if(accuracy > bestAccuracy) // check if to update accuracy
                 {
@@ -172,7 +187,7 @@ void backward_search (vector<vector<double>> bork)
                     cout << current_set_of_features[kek] << " ";
                 }
                 cout << endl;
-                accuracy = leaveOneOut(bork,testerSet);
+                accuracy = leaveOneOut(bork,testerSet,false);
                 cout << "Accuracy: " << accuracy << endl;
                 if(accuracy > bestAccuracy)
                 {
@@ -216,8 +231,72 @@ void backward_search (vector<vector<double>> bork)
     return;
 }
 
+int count,bestCount;
 void custom_search(vector<vector<double>> troop) {
-    for()
+    bestCount = 0;
+    cout << "This is feature size: " << troop[0].size()-1 << endl;
+    cout << "Data size: " << troop.size() << endl;
+    master_list.clear();
+    for(int i = 1; i < troop[0].size(); i++) 
+    { // starting from 1, # of features is 10
+        cout << "On the " << i  << "th level of the search tree " << endl;
+        feature_to_add.clear();
+        testerSet.clear();
+        bestAccuracy = 0.0;
+        for(int j = 1; j < troop[0].size(); j++) 
+        {
+            if(!(find(current_set_of_features.begin(),current_set_of_features.end(),j) != current_set_of_features.end())) 
+            { // Consider if it does not exist
+                cout << "--Considering adding the " << j << " feature" << endl;
+                testerSet = current_set_of_features;
+                testerSet.push_back(j);
+                cout << "Tester Set: ";
+                for(int yelp = 0; yelp < testerSet.size();yelp++) { // output tester set
+                    cout << testerSet[yelp] << " ";
+                }
+                cout << endl << "current set: ";
+
+                for (int kek = 0; kek < current_set_of_features.size();kek++) // output current set of features 
+                {
+                    cout << current_set_of_features[kek] << " ";
+                }
+                cout << endl;
+                accuracy = leaveOneOut(troop,testerSet,true);
+                cout << "Accuracy: " << accuracy << endl; // output the leave one out accuracy 
+                if(accuracy > bestAccuracy) // check if to update accuracy
+                {
+                    cout << "time to update best: " << accuracy << endl; 
+                    bestAccuracy = accuracy;
+                    goodFeature = j;
+                }
+            }
+        }
+        current_set_of_features.push_back(goodFeature);
+        testerSet.clear();
+        if (bestestAccuracy < bestAccuracy) 
+        {
+            bestestAccuracy = bestAccuracy;
+            master_list = current_set_of_features;
+        }
+        cout << "pushing goodFeature: " << goodFeature << endl;
+        bestCounter = 100;
+        cout << "On level " << i << " I added feature " << goodFeature << " to current set" << endl;
+        cout << "The best accuracy is: " << bestestAccuracy << endl;
+        cout << "Pure Set: ";
+        for(int pure = 0; pure < current_set_of_features.size();pure++) {
+            if (pure != current_set_of_features.size()-1) {
+                cout << current_set_of_features[pure] << " ";
+            }
+            else {
+                cout << current_set_of_features[pure] << endl;
+            }
+        }
+        cout << "Master List: " << endl;
+        for(int curr = 0; curr < master_list.size(); curr++) {
+            cout << master_list[curr] << " " << endl;
+        }
+    }
+    //cout << "Line count: " << count << endl;
     return;
 }
 void parse_data() {
@@ -253,5 +332,6 @@ void parse_data() {
     }
     inFile.close();
     //forward_search(data);
-    backward_search(data);
+    //backward_search(data);
+    custom_search(data);
 }
