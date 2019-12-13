@@ -18,12 +18,13 @@ double total = 0.0;
 int counter = 0;
 int bestCounter = 100;
 int errCounter = 0;
+vector<double> allBest;
 double leaveOneOut(vector<vector<double>> test, vector<int>goodSet, bool customCheck) 
 {
     errCounter = 0;
     counter = 0;
     total = 0.0;
-    cout << "Size of GoodSet= " << goodSet.size() << endl;
+    //cout << "Size of GoodSet= " << goodSet.size() << endl;
     for(int i = 0; i < test.size(); i++) 
     { // get row
         bestDist = 99999.9999;
@@ -33,7 +34,6 @@ double leaveOneOut(vector<vector<double>> test, vector<int>goodSet, bool customC
             cDistance = 0.0;
             if(i != j) 
             {
-                //cout << "Size of GoodSet  = " << goodSet.size() << endl;
                 for(int k = 0; k < goodSet.size(); k++) 
                 {
                     cDistance += pow((test[i][goodSet[k]] - test[j][goodSet[k]]),2);
@@ -51,21 +51,17 @@ double leaveOneOut(vector<vector<double>> test, vector<int>goodSet, bool customC
         }
         else
         {
-            errCounter = errCounter + 1;
             if(customCheck)
             {
+                errCounter = errCounter + 1;
                 if(bestCounter < errCounter)
                 {
                     return 0.0;
                 }
-                
             }
         }
     }
-    //cout << "Test size is: " << test.size() << endl;
-    cout << "Count is: " << counter << endl;
     total = (double(counter) / double(test.size()));
-    cout << "total is: " << total << endl;
     bestCounter = test.size() - counter;
     return total;
 }
@@ -93,24 +89,12 @@ void forward_search(vector<vector<double>> data) {
             { // Consider if it does not exist
                 cout << "--Considering adding the " << j << " feature" << endl;
                 testerSet = current_set_of_features;
-                testerSet.push_back(j);
-                cout << "Tester Set: ";
-                for(int yelp = 0; yelp < testerSet.size();yelp++) { // output tester set
-                    cout << testerSet[yelp] << " ";
-                }
-                cout << endl << "current set: ";
-
-                for (int kek = 0; kek < current_set_of_features.size();kek++) // output current set of features 
-                {
-                    cout << current_set_of_features[kek] << " ";
-                }
-                cout << endl;
-                
+                testerSet.push_back(j);   
                 accuracy = leaveOneOut(data,testerSet,false);
-                cout << "Accuracy: " << accuracy << endl; // output the leave one out accuracy 
+               // cout << "Accuracy: " << accuracy << endl; // output the leave one out accuracy 
                 if(accuracy > bestAccuracy) // check if to update accuracy
                 {
-                    cout << "time to update best: " << accuracy << endl; 
+                   // cout << "time to update best: " << accuracy << endl; 
                     bestAccuracy = accuracy;
                     goodFeature = j;
                 }
@@ -124,18 +108,9 @@ void forward_search(vector<vector<double>> data) {
             master_list = current_set_of_features;
         }
         cout << "pushing goodFeature: " << goodFeature << endl;
-        
         cout << "On level " << i << " I added feature " << goodFeature << " to current set" << endl;
-        cout << "The best accuracy is: " << bestestAccuracy << endl;
-        cout << "Pure Set: {";
-        for(int pure = 0; pure < current_set_of_features.size();pure++) {
-            if (pure != current_set_of_features.size()-1) {
-                cout << current_set_of_features[pure] << ", ";
-            }
-            else {
-                cout << current_set_of_features[pure] << '}' << endl;
-            }
-        }
+        cout << "The best accuracy is: " << bestestAccuracy * 100 << '%' << endl;
+        allBest.push_back(bestAccuracy * 100); // grabs bestest Accuracies per feature
     }
     cout << "Finished search!! The best feature subset is {";
     for(int curr = 0; curr < master_list.size(); curr++) {
@@ -146,7 +121,16 @@ void forward_search(vector<vector<double>> data) {
             cout << master_list[curr] << "}, ";
         }
     }
-    cout << "which has an accuracy of " << bestestAccuracy * 100 << '%';
+    cout << "which has an accuracy of " << bestestAccuracy * 100 << '%' << endl;
+    cout << "List of Bestest Accuracies: { ";
+    for(int alpha = 0; alpha < allBest.size(); alpha++) {
+        if(alpha != allBest.size()-1) {
+            cout << '[' << alpha+1 << ", " << allBest[alpha] << "], ";
+        }
+        else {
+            cout << '[' << alpha+1 << ", " << allBest[alpha] << "] }, ";
+        }
+    }
     return;
 }
 
@@ -154,8 +138,7 @@ double badAccuracy;
 vector<int> feature_to_remove;
 int badFeature = 0;
 
-void backward_search (vector<vector<double>> bork) 
-{
+void backward_search (vector<vector<double>> bork) {
     bestestAccuracy = 0.0;
     for(int po = 1; po < bork[0].size(); po++)
     {
@@ -177,21 +160,9 @@ void backward_search (vector<vector<double>> bork)
                 cout << "--Considering removing the " << j << " feature" << endl;
                 testerSet = current_set_of_features;
                 testerSet.erase(remove(testerSet.begin(),testerSet.end(),j), testerSet.end());
-                cout << "Tester Set: ";
-                for(int yelp = 0; yelp < testerSet.size();yelp++) { // output tester set
-                    cout << testerSet[yelp] << " ";
-                }
-                cout << endl << "current set: ";
-                for (int kek = 0; kek < current_set_of_features.size();kek++) // output current set of features 
-                {
-                    cout << current_set_of_features[kek] << " ";
-                }
-                cout << endl;
                 accuracy = leaveOneOut(bork,testerSet,false);
-                cout << "Accuracy: " << accuracy << endl;
                 if(accuracy > bestAccuracy)
                 {
-                    cout << "time to update best: " << accuracy << endl;
                     bestAccuracy = accuracy;
                     badFeature = j;
                 }
@@ -206,21 +177,27 @@ void backward_search (vector<vector<double>> bork)
             master_list = current_set_of_features;
         }
         cout << "Removing badFeature: " << badFeature << endl;
-
         cout << "On level " << i << " I removed feature " << badFeature << " from current set." << endl;
-        cout << "The best accuracy is: " << bestestAccuracy << endl;
-        cout << "Current Set: ";
-        for(int master = 0; master < current_set_of_features.size();master++) {
-            if (master != current_set_of_features.size()-1) {
-                cout << current_set_of_features[master] << " ";
-            }
-            else {
-                cout << current_set_of_features[master] << endl;
-            }
+        cout << "The best accuracy is: " << bestestAccuracy * 100 << '%' << endl;
+        allBest.push_back(bestAccuracy * 100); // grabs bestest Accuracies per feature
+    }
+    cout << "Finished search!! The best feature subset is {";
+    for(int curr = 0; curr < master_list.size(); curr++) {
+        if(curr != master_list.size()-1) {
+            cout << master_list[curr] << ", ";
         }
-        cout << "Master List: " << endl;
-        for(int curr = 0; curr < master_list.size(); curr++) {
-            cout << master_list[curr] << " ";
+        else {
+            cout << master_list[curr] << "}, ";
+        }
+    }
+    cout << "which has an accuracy of " << bestestAccuracy * 100 << '%' << endl;
+    cout << "List of Bestest Accuracies: { ";
+    for(int alpha = 0; alpha < allBest.size(); alpha++) {
+        if(alpha != allBest.size()-1) {
+            cout << '[' << alpha+1 << ", " << allBest[alpha] << "], ";
+        }
+        else {
+            cout << '[' << alpha+1 << ", " << allBest[alpha] << "] }, ";
         }
     }
     return;
@@ -245,22 +222,9 @@ void custom_search(vector<vector<double>> troop) {
                 cout << "--Considering adding the " << j << " feature" << endl;
                 testerSet = current_set_of_features;
                 testerSet.push_back(j);
-                cout << "Tester Set: ";
-                for(int yelp = 0; yelp < testerSet.size();yelp++) { // output tester set
-                    cout << testerSet[yelp] << " ";
-                }
-                cout << endl << "current set: ";
-
-                for (int kek = 0; kek < current_set_of_features.size();kek++) // output current set of features 
-                {
-                    cout << current_set_of_features[kek] << " ";
-                }
-                cout << endl;
                 accuracy = leaveOneOut(troop,testerSet,true);
-                cout << "Accuracy: " << accuracy << endl; // output the leave one out accuracy 
                 if(accuracy > bestAccuracy) // check if to update accuracy
                 {
-                    cout << "time to update best: " << accuracy << endl; 
                     bestAccuracy = accuracy;
                     goodFeature = j;
                 }
@@ -276,23 +240,28 @@ void custom_search(vector<vector<double>> troop) {
         cout << "pushing goodFeature: " << goodFeature << endl;
         bestCounter = 100;
         cout << "On level " << i << " I added feature " << goodFeature << " to current set" << endl;
-        cout << "The best accuracy is: " << bestestAccuracy << endl;
-        cout << "Pure Set: ";
-        for(int pure = 0; pure < current_set_of_features.size();pure++) {
-            if (pure != current_set_of_features.size()-1) {
-                cout << current_set_of_features[pure] << " ";
-            }
-            else {
-                cout << current_set_of_features[pure] << endl;
-            }
+        cout << "The best accuracy is: " << bestestAccuracy * 100 << '%' << endl;
+        allBest.push_back(bestAccuracy * 100); // grabs bestest Accuracies per feature
+    }
+    cout << "Finished search!! The best feature subset is {";
+    for(int curr = 0; curr < master_list.size(); curr++) {
+        if(curr != master_list.size()-1) {
+            cout << master_list[curr] << ", ";
         }
-        cout << "Master List: " << endl;
-        for(int curr = 0; curr < master_list.size(); curr++) {
-            cout << master_list[curr] << " " << endl;
+        else {
+            cout << master_list[curr] << "}, ";
         }
     }
-    //cout << "Line count: " << count << endl;
-    return;
+    cout << "which has an accuracy of " << bestestAccuracy * 100 << '%' << endl;
+    cout << "List of Bestest Accuracies: { ";
+    for(int alpha = 0; alpha < allBest.size(); alpha++) {
+        if(alpha != allBest.size()-1) {
+            cout << '[' << alpha+1 << ", " << allBest[alpha] << "], ";
+        }
+        else {
+            cout << '[' << alpha+1 << ", " << allBest[alpha] << "] }, ";
+        }
+    }
 }
 void parse_data() 
 {
@@ -343,7 +312,4 @@ void parse_data()
             custom_search(data);
             break;
     }
-    //forward_search(data);
-    //backward_search(data);
-    //custom_search(data);
 }
