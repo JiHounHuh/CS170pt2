@@ -11,8 +11,8 @@
 using namespace std;
 
 int main() {
+
     parse_data();
-    //parse_data(file);
     return 0;
 }
 

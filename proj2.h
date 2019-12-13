@@ -113,9 +113,6 @@ void forward_search(vector<vector<double>> data) {
                     cout << "time to update best: " << accuracy << endl; 
                     bestAccuracy = accuracy;
                     goodFeature = j;
-                    // if(bestAccuracy > bestestAccuracy) {
-                    //     master_list = current_set_of_features;
-                    // }
                 }
             }
         }
@@ -130,31 +127,35 @@ void forward_search(vector<vector<double>> data) {
         
         cout << "On level " << i << " I added feature " << goodFeature << " to current set" << endl;
         cout << "The best accuracy is: " << bestestAccuracy << endl;
-        cout << "Pure Set: ";
+        cout << "Pure Set: {";
         for(int pure = 0; pure < current_set_of_features.size();pure++) {
             if (pure != current_set_of_features.size()-1) {
-                cout << current_set_of_features[pure] << " ";
+                cout << current_set_of_features[pure] << ", ";
             }
             else {
-                cout << current_set_of_features[pure] << endl;
+                cout << current_set_of_features[pure] << '}' << endl;
             }
         }
-        cout << "Master List: " << endl;
-        for(int curr = 0; curr < master_list.size(); curr++) {
-            cout << master_list[curr] << " " << endl;
+    }
+    cout << "Finished search!! The best feature subset is {";
+    for(int curr = 0; curr < master_list.size(); curr++) {
+        if(curr != master_list.size()-1) {
+            cout << master_list[curr] << ", ";
+        }
+        else {
+            cout << master_list[curr] << "}, ";
         }
     }
-    //cout << "Line count: " << count << endl;
+    cout << "which has an accuracy of " << bestestAccuracy * 100 << '%';
     return;
 }
 
-double worstAccuracy,badAccuracy;
+double badAccuracy;
 vector<int> feature_to_remove;
 int badFeature = 0;
 
 void backward_search (vector<vector<double>> bork) 
 {
-    worstAccuracy = 0.0;
     bestestAccuracy = 0.0;
     for(int po = 1; po < bork[0].size(); po++)
     {
@@ -167,7 +168,6 @@ void backward_search (vector<vector<double>> bork)
     {
         cout << "On the " << i << "th level of the search tree" << endl;
         feature_to_add.clear();
-        worstAccuracy = 100.0;
         bestAccuracy = 0.0;
         testerSet.clear();
         for(int j = 1; j < bork[0].size();j++) 
@@ -195,11 +195,6 @@ void backward_search (vector<vector<double>> bork)
                     bestAccuracy = accuracy;
                     badFeature = j;
                 }
-                // if(accuracy > badAccuracy) 
-                // {
-                //     badAccuracy = accuracy;
-                //     badFeature = j;
-                // }
             }
         }
         current_set_of_features.erase(remove(current_set_of_features.begin(),current_set_of_features.end(),badFeature),current_set_of_features.end());
@@ -299,21 +294,22 @@ void custom_search(vector<vector<double>> troop) {
     //cout << "Line count: " << count << endl;
     return;
 }
-void parse_data() {
+void parse_data() 
+{
     vector<vector<double>> data; // stores all data sets
     vector<double> temp;
     vector<double> checkup;
     double lowestVal = 0.0;
     double value = 0.0;
-    double a=0.0,b=0.0;
-    int count = 0;
     double checkVal = 0.0;
+    int a;
     int feature = 0;
     string tempLine;
     string file;
-    cout << "Input filename of data: "; // prompt for input of data
+    cout << "Welcome to Ji Houn Huh's Feature Selection Algorithm." << endl;
+    cout << "Type in the name of the file to test: "; // prompt for input of data
     cin >> file;
-    cout << endl;
+    cout << endl << endl;
     ifstream inFile;
     inFile.open(file);
     if (!inFile) { // ensure that file is valid
@@ -328,10 +324,26 @@ void parse_data() {
             temp.push_back(value);
         }
         data.push_back(temp);
-        count++;
     }
     inFile.close();
+    cout << "Type the number of the algorithm you want to run." << endl;
+    cout << "   1) Forward Selection"<<endl;
+    cout << "   2) Backward Elimination" << endl;
+    cout << "   3) Ji Houn's Special Algorithm." << endl;
+    cin >> a;
+    switch (a)
+    {
+        case 1: 
+            forward_search(data);
+            break;
+        case 2:
+            backward_search(data);
+            break;
+        case 3: 
+            custom_search(data);
+            break;
+    }
     //forward_search(data);
     //backward_search(data);
-    custom_search(data);
+    //custom_search(data);
 }
